@@ -1,0 +1,32 @@
+version: '2'
+services:
+    mariadb:
+        image: 'mariadb:latest'
+        environment:
+            - MYSQL_USER=wms
+            - MYSQL_DATABASE=wms
+            - MYSQL_PASSWORD=wms1234
+            - MYSQL_ROOT_PASSWORD=1158694103
+        volumes:
+            # Mounting the content of the database inside of a subfolder named mariadb_data
+            - './mariadb_data:/var/lib/mysql'
+        networks:
+            mynet:
+                ipv4_address: 172.25.0.2
+    webserver:
+        #container_name: wiki
+        build: .docker/
+        volumes:
+            # Mounting the website inside of a subfolder named app
+            - ./app/:/var/www/html
+            - .docker/virtualhost.conf:/etc/apache2/sites-enabled/000-default.conf
+            - .docker/mcrypt.ini:/etc/php/7.3/apache2/conf.d/20-mcrypt.ini
+        networks:
+            mynet:
+                ipv4_address: 172.25.0.3
+networks:
+    mynet:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: 172.25.0.0/24
